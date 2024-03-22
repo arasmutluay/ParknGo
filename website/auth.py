@@ -63,12 +63,40 @@ def login():
                 flash('Logged in', category='success')
                 return redirect(url_for('views.home'))
             else:
-                flash('Incorrect password, try again!', category='error')
+                flash('Incorrect password, try again!', category='danger')
         else:
             flash('Email does not exist!', category='error')
 
     return render_template("login.html", user=current_user)
 
+
+@auth.route('/change_password', methods=['GET', 'POST'])
+@login_required
+def change_password():
+    if not current_user.is_authenticated:
+        flash("Access Denied: First you need to login before changing password.", 'error')
+        return redirect(url_for('views.home'))
+
+    if request.method == 'POST':
+        old_password = request.form.get('old_password')
+        new_password = request.form.get('new_password')
+        user = current_user
+
+        if new_password == old_password:
+            flash("Error: New password cannot be the same as your old password.", 'error')
+            return redirect(url_for('auth.change_password'))
+
+        if old_password != user.password:
+            flash("Error: Incorrect old password. Please try again.", 'error')
+            return redirect(url_for('auth.change_password'))
+
+        user.password = new_password
+        db.session.commit()
+
+        flash("Password changed successfully!", 'success')
+        return redirect(url_for('auth.change_password'))
+
+    return render_template("change_password.html", user=current_user)
 
 
 @auth.route('/logout', methods=['GET', 'POST'])

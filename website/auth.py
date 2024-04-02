@@ -1,11 +1,63 @@
-from flask import Blueprint, flash, redirect, url_for, session, render_template, request
+from flask import Blueprint, flash, redirect, url_for, session, render_template, request, current_app
 from flask_login import current_user, logout_user, login_required, login_user
+from flask_mail import Message
 from email_validator import validate_email, EmailNotValidError
+from email.message import EmailMessage
+import ssl
+import smtplib
 
-from website import db
+from itsdangerous import URLSafeTimedSerializer
+from werkzeug.security import check_password_hash
+
+from website import db, mail
 from website.models import User
 
 auth = Blueprint('auth', __name__)
+
+
+def send_email(email_reciever, subject, body):
+    email_sender = 'aras.mutluay99@gmail.com'
+    email_password = 'jizo cyzj zjrx ymvl'
+
+    em = EmailMessage()
+    em['From'] = email_sender
+    em['To'] = email_reciever
+    em['Subject'] = subject
+    em.set_content(body)
+
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as smtp:
+        smtp.login(email_sender, email_password)
+        smtp.sendmail(email_sender, email_reciever, em.as_string())
+
+    return "Message sent!"
+
+
+def generate_token(email):
+    # Choose a secret key (keep it secret and secure)
+    secret_key = 'secret_key'
+
+    # Create a URLSafeTimedSerializer object with the secret key
+    serializer = URLSafeTimedSerializer(secret_key)
+
+    # Generate a token using the user's email
+    token = serializer.dumps(email, salt='email-confirm')
+
+    return token
+
+
+def verify_token(token):
+    secret_key = 'secret_key'
+    serializer = URLSafeTimedSerializer(secret_key)
+
+    try:
+        # Decode the token and verify it
+        email = serializer.loads(token, salt='email-confirm',
+                                 max_age=3600)  # max_age sets token expiration time (in seconds)
+        return email
+    except Exception as e:
+        # Token is invalid or expired
+        return None
 
 
 @auth.route('/signup', methods=['GET', 'POST'])
@@ -16,34 +68,82 @@ def sign_up():
 
     if request.method == 'POST':
         email = request.form.get('email')
-        firstName = request.form.get('firstName')
-        password1 = request.form.get('password1')
-        password2 = request.form.get('password2')
-        birthDate = request.form.get('birthDate')
-        user = User.query.filter_by(email=email).first()
+        first_name = request.form.get('first_name')
+        last_name = request.form.get('last_name')
+        birth_date = request.form.get('birth_date')
+        country = request.form.get('country')
+        city = request.form.get('city')
+        gender = request.form.get('gender')
+        address = request.form.get('address')
+        phone_number = request.form.get('phone_number')
 
         try:
             validate = validate_email(email)
             email = validate["email"]
         except EmailNotValidError as e:
             flash('Please enter a valid email!', category='error')
-            return render_template("sign_up.html", user=current_user)
+            return render_template("signup.html", user=current_user)
+
+        session['new_user'] = {
+            'email': email,
+            'first_name': first_name,
+            'last_name': last_name,
+            'birth_date': birth_date,
+            'country': country,
+            'city': city,
+            'gender': gender,
+            'address': address,
+            'phone_number': phone_number,
+            'role': 'user'
+        }
+
+        user = User.query.filter_by(email=email).first()
 
         if user:
             flash('Email already exists!', category='error')
-        elif password1 != password2:
-            flash('Passwords don\'t match.', category='error')
 
         else:
-            new_user = User(email=email, firstName=firstName,
-                            password=password1, birthDate=birthDate, role='user')
-            db.session.add(new_user)
-            db.session.commit()
-            login_user(new_user)
-            flash('Account created!', category='success')
-            return redirect(url_for('views.home'))
+            token = generate_token(email)
+            subject = 'Create a Password'
+            body = f'Please click the link below to create a password: {url_for("auth.create_password", token=token, _external=True)}'
+            send_email(email, subject, body)
+
+            flash('An email has been sent with a link to create your password.', category='success')
+            return redirect(url_for('auth.sign_up'))
 
     return render_template("signup.html", user=current_user)
+
+
+@auth.route('/create_password/<token>', methods=['GET', 'POST'])
+def create_password(token):
+    if request.method == 'POST':
+        email = verify_token(token)
+
+        if email:
+            user_details = session.pop('new_user', None)
+            if user_details:
+                password = request.form.get('password')
+                confirm_password = request.form.get('confirm_password')
+
+                if password != confirm_password:
+                    flash('Passwords do not match.', category='error')
+                    return redirect(url_for('auth.create_password', token=token))
+
+                new_user = User(**user_details)
+                new_user.set_password(password)
+                db.session.add(new_user)
+                db.session.commit()
+
+                flash('Password successfully set. You can now login.', category='success')
+                return redirect(url_for('auth.login'))
+            else:
+                flash('User details not found in the session.', category='error')
+        else:
+            flash('Invalid token.', category='error')
+
+        return redirect(url_for('auth.login'))
+
+    return render_template('create_password.html', token=token)
 
 
 @auth.route('/login', methods=['GET', 'POST'])
@@ -58,7 +158,7 @@ def login():
         user = User.query.filter_by(email=email).first()
 
         if user:
-            if user.password == password:
+            if user.check_password(password):
                 login_user(user, remember=True)
                 flash('Logged in', category='success')
                 return redirect(url_for('views.home'))

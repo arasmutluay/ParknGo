@@ -34,13 +34,8 @@ def send_email(email_reciever, subject, body):
 
 
 def generate_token(email):
-    # Choose a secret key (keep it secret and secure)
     secret_key = 'secret_key'
-
-    # Create a URLSafeTimedSerializer object with the secret key
     serializer = URLSafeTimedSerializer(secret_key)
-
-    # Generate a token using the user's email
     token = serializer.dumps(email, salt='email-confirm')
 
     return token
@@ -51,12 +46,10 @@ def verify_token(token):
     serializer = URLSafeTimedSerializer(secret_key)
 
     try:
-        # Decode the token and verify it
         email = serializer.loads(token, salt='email-confirm',
-                                 max_age=3600)  # max_age sets token expiration time (in seconds)
+                                 max_age=3600)
         return email
     except Exception as e:
-        # Token is invalid or expired
         return None
 
 
@@ -197,6 +190,47 @@ def change_password():
         return redirect(url_for('auth.change_password'))
 
     return render_template("change_password.html", user=current_user)
+
+
+@auth.route('/forgot_password', methods=['GET', 'POST'])
+def forgot_password():
+    if current_user.is_authenticated:
+        flash("Access Denied: First you need to logout before using the forgot password", 'error')
+        return redirect(url_for('views.home'))
+
+    if request.method == 'POST':
+        email = request.form.get('email')
+        token = generate_token(email)
+        subject = 'Reset Your Password'
+        body = f'Please click the link below to reset your password: {url_for("auth.set_new_password", token=token, _external=True)}'
+        send_email(email, subject, body)
+
+        flash('An email has been sent with a link to reset your password.', category='success')
+        return redirect(url_for('views.home'))
+
+    return render_template("forgot_password.html", user=current_user)
+
+
+@auth.route('/set_new_password/<token>', methods=['GET', 'POST'])
+def set_new_password(token):
+    if request.method == 'POST':
+        email = verify_token(token)
+
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+
+        if password != confirm_password:
+            flash('Passwords do not match.', category='error')
+            return redirect(url_for('/set_new_password/<token>', token=token))
+
+        user = User.query.filter_by(email=email).first()
+        user.set_password(password)
+        db.session.commit()
+
+        flash('Password changed successfully. You can now log in with your new password.', category='success')
+        return redirect(url_for('auth.login'))
+
+    return render_template('set_new_password.html', user=current_user, token=token)
 
 
 @auth.route('/logout', methods=['GET', 'POST'])

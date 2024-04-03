@@ -2,20 +2,26 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
+    {% include "header.html" %}
 </head>
 <body>
-{% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        {% for category, message in messages %}
-            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        {% endfor %}
-    {% endif %}
-{% endwith %}
-<h1>Test Home</h1>
-<p>Logged in as {{ current_user.first_name }}</p>
+<div class="px-4 py-5 my-5 text-center">
+    <h1 class="display-5 fw-bold text-body-emphasis">Welcome</h1>
+    <div class="col-lg-6 mx-auto">
+        <p class="lead mb-4">Logged in as: {{ current_user.first_name }}</p>
+        <p class="lead mb-4">Role: {{ current_user.role }}</p>
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+            <a href="/signup">
+                <button type="button" class="btn btn-primary btn-lg px-4 gap-3">Sign Up</button>
+            </a>
+            <a href="/login">
+                <button type="button" class="btn btn-outline-secondary btn-lg px-4">Login</button>
+            </a>
+        </div>
+    </div>
+</div>
 </body>
 </html>

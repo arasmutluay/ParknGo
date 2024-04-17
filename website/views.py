@@ -30,8 +30,9 @@ def home():
 @views.route('/carpark_list', methods=['GET'])
 def carpark_list():
     page = request.args.get('page', 1, type=int)
-    per_page = 20
-    car_parks = Carpark.query.paginate(page=page, per_page=per_page)
+    rows_per_page = 20
+
+    car_parks = Carpark.query.paginate(page=page, per_page=rows_per_page)
 
     return render_template("carpark_list.html", user=current_user,
                            car_parks=car_parks)

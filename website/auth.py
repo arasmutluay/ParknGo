@@ -134,7 +134,7 @@ def create_password(token):
 
         return redirect(url_for('auth.login'))
 
-    return render_template('create_password.html', token=token)
+    return render_template('create_password.html', user=current_user, token=token)
 
 
 @auth.route('/login', methods=['GET', 'POST'])

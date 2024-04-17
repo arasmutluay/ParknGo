@@ -66,6 +66,7 @@
     {% if car_parks.has_prev %}
         <a href="{{ url_for('views.carpark_list', page=car_parks.prev_num) }}" class="btn btn-primary">Previous</a>
     {% endif %}
+
     {% if car_parks.has_next %}
         <a href="{{ url_for('views.carpark_list', page=car_parks.next_num) }}" class="btn btn-primary">Next</a>
     {% endif %}

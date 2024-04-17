@@ -18,7 +18,7 @@ def create_app():
     # load_dotenv()
 
     app.config['SECRET_KEY'] = 'asd123'
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:12345@localhost:5432/parkngo'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost:5432/parkngo'
 
     db.init_app(app)
     migrate.init_app(app, db)
@@ -49,3 +49,6 @@ def create_app():
 def create_database():
     if not path.exists('website/' + DB_NAME):
         db.create_all()
+
+
+

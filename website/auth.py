@@ -1,15 +1,13 @@
 from flask import Blueprint, flash, redirect, url_for, session, render_template, request, current_app
 from flask_login import current_user, logout_user, login_required, login_user
-from flask_mail import Message
 from email_validator import validate_email, EmailNotValidError
 from email.message import EmailMessage
 import ssl
 import smtplib
 
 from itsdangerous import URLSafeTimedSerializer
-from werkzeug.security import check_password_hash
 
-from website import db, mail
+from website import db
 from website.models import User
 
 auth = Blueprint('auth', __name__)

@@ -5,23 +5,55 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
+    <style>
+        .dashboard-box {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+    </style>
     {% include "header.html" %}
 </head>
 <body>
-<div class="px-4 py-5 my-5 text-center">
-    <h1 class="display-5 fw-bold text-body-emphasis">Welcome</h1>
-    <div class="col-lg-6 mx-auto">
-        <p class="lead mb-4">Logged in as: {{ current_user.first_name }}</p>
-        <p class="lead mb-4">Role: {{ current_user.role }}</p>
-        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-            <a href="/signup">
-                <button type="button" class="btn btn-primary btn-lg px-4 gap-3">Sign Up</button>
-            </a>
-            <a href="/login">
-                <button type="button" class="btn btn-outline-secondary btn-lg px-4">Login</button>
-            </a>
-        </div>
-    </div>
+<div class="px-4 py-5 my-5">
+    {% if user.is_authenticated and user.role == 'admin' %}
+            <div class="container-sm">
+                <h1 align="center">Admin Dashboard</h1>
+                <div class="dashboard-box">
+                    <h2>End Users</h2>
+                    <p>Total End Users: {{ total_end_users }}</p>
+                    <p>Active End Users: {{ active_end_users }}</p>
+                    <p>Inactive End Users: {{ inactive_end_users }}</p>
+                </div>
+                <div class="dashboard-box">
+                    <h2>Car Parks</h2>
+                    <p>Total Car Parks: {{ total_car_parks }}</p>
+                    <p>Active Car Parks: {{ active_car_parks }}</p>
+                    <p>Blocked Car Parks: {{ blocked_car_parks }}</p>
+                    <button class="button" onclick="location.href='carpark_list';">Manage Car Parks</button>
+                </div>
+            </div>
+        {% else %}
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                <a href="/signup">
+                    <button type="button" class="btn btn-primary btn-lg px-4 gap-3">Sign Up</button>
+                </a>
+                <a href="/login">
+                    <button type="button" class="btn btn-outline-secondary btn-lg px-4">Login</button>
+                </a>
+            </div>
+        {% endif %}
 </div>
 </body>
 </html>

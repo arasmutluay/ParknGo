@@ -41,13 +41,13 @@
 <header class="d-flex flex-wrap justify-content-between align-items-center border-bottom">
     <ul class="nav nav-pills ms-auto">
         {% if user.is_authenticated %}
-
-        <p class="lead mb-4">Logged in as: {{ current_user.first_name }}</p>
-        <p class="lead mb-4">Role: {{ current_user.role }}</p>
-        <li class="nav-item"><a id="home" aria-current="page" class="nav-link rounded-pill" href="/">Home</a></li>
-        {% if user.role == 'admin' %}
-            <li class="nav-item"><a class="nav-link" href="/create_carpark">Create Car Park</a></li>
-        {% endif %}
+            <p class="lead mb-4">Logged in as: {{ current_user.first_name }}</p>
+            <p class="lead mb-4">Role: {{ current_user.role }}</p>
+            <li class="nav-item"><a id="home" aria-current="page" class="nav-link rounded-pill" href="/">Home</a></li>
+            <li class="nav-item"><a id="home" aria-current="page" class="nav-link rounded-pill" href="/change_password">Reset Password</a></li>
+            {% if user.role == 'admin' %}
+                <li class="nav-item"><a class="nav-link" href="/create_carpark">Create Car Park</a></li>
+            {% endif %}
             <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
         {% else %}
             <li class="nav-item"><a class="nav-link rounded-pill" href="/signup">Sign Up</a></li>

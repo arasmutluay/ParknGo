@@ -1,11 +1,11 @@
-from flask import Blueprint, flash, redirect, url_for, session, render_template, request, current_app
+from flask import Blueprint, flash, redirect, url_for, session, render_template, request
 from flask_login import current_user, logout_user, login_required, login_user
 from email_validator import validate_email, EmailNotValidError
 from email.message import EmailMessage
 import ssl
 import smtplib
-
 from itsdangerous import URLSafeTimedSerializer
+from werkzeug.security import check_password_hash
 
 from website import db
 from website.models import User
@@ -15,7 +15,7 @@ auth = Blueprint('auth', __name__)
 
 def send_email(email_reciever, subject, body):
     email_sender = 'aras.mutluay99@gmail.com'
-    email_password = 'jizo cyzj zjrx ymvl'
+    email_password = 'igoz nfol azmc tqob'
 
     em = EmailMessage()
     em['From'] = email_sender
@@ -173,15 +173,15 @@ def change_password():
         new_password = request.form.get('new_password')
         user = current_user
 
+        if not user.check_password(old_password):
+            flash("Error: Incorrect old password. Please try again.", 'error')
+            return redirect(url_for('auth.change_password'))
+
         if new_password == old_password:
             flash("Error: New password cannot be the same as your old password.", 'error')
             return redirect(url_for('auth.change_password'))
 
-        if old_password != user.password:
-            flash("Error: Incorrect old password. Please try again.", 'error')
-            return redirect(url_for('auth.change_password'))
-
-        user.password = new_password
+        user.set_password(new_password)
         db.session.commit()
 
         flash("Password changed successfully!", 'success')

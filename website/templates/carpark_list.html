@@ -20,17 +20,6 @@
 </style>
 <body>
 <div class="container">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-
     <table class="table mt-5">
         <thead>
         <tr>
@@ -43,6 +32,7 @@
             <th scope="col">Remaining Capacity</th>
             <th scope="col">Max Total Capacity</th>
             <th scope="col">Status</th>
+            <th scope="col">Actions</th>
 
         </tr>
         </thead>
@@ -58,6 +48,16 @@
                 <td>{{ car_park.remaining_capacity }}</td>
                 <td>{{ car_park.max_total_capacity }}</td>
                 <td>{{ car_park.status }}</td>
+                <td>
+                    <form action="{{ url_for('views.carpark_list') }}" method="POST">
+                        <input type="hidden" name="car_park_id" value="{{ car_park.id }}">
+                        {% if car_park.status == 'active' %}
+                            <button type="submit" name="action" value="block" class="btn btn-danger">Block</button>
+                        {% else %}
+                            <button type="submit" name="action" value="unblock" class="btn btn-success">Unblock</button>
+                        {% endif %}
+                    </form>
+                </td>
             </tr>
         {% endfor %}
         </tbody>

@@ -3,9 +3,8 @@ from flask import Flask
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
-import os
-from os import path, getenv
-from flask_mail import Mail, Message
+from os import path
+from flask_mail import Mail
 
 db = SQLAlchemy()
 migrate = Migrate()

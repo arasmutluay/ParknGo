@@ -27,8 +27,25 @@ def home():
                            blocked_car_parks=blocked_car_parks)
 
 
-@views.route('/carpark_list', methods=['GET'])
+@views.route('/carpark_list', methods=['GET', 'POST'])
 def carpark_list():
+    if not current_user.is_authenticated and current_user.role == 'admin':
+        flash("Access Denied: First you need to be logged in as an Admin!.", 'error')
+        return redirect(url_for('views.home'))
+
+    if request.method == 'POST':
+        car_park_id = request.form.get('car_park_id')
+        action = request.form.get('action')
+
+        if action == 'block':
+            block_carpark(car_park_id)
+            flash("Car park blocked successfully!", 'success')
+        elif action == 'unblock':
+            unblock_carpark(car_park_id)
+            flash("Car park unblocked successfully!", 'success')
+
+        return redirect(url_for('views.carpark_list'))
+
     page = request.args.get('page', 1, type=int)
     rows_per_page = 20
 
@@ -36,6 +53,30 @@ def carpark_list():
 
     return render_template("carpark_list.html", user=current_user,
                            car_parks=car_parks)
+
+
+def block_carpark(carpark_id):
+    car_park = Carpark.query.get(carpark_id)
+    if car_park:
+        if car_park.status != "blocked":
+            car_park.status = "blocked"
+            db.session.commit()
+        else:
+            flash("Car park is already blocked.", "warning")
+    else:
+        flash("Car park not found.", "error")
+
+
+def unblock_carpark(carpark_id):
+    car_park = Carpark.query.get(carpark_id)
+    if car_park:
+        if car_park.status != "active":
+            car_park.status = "active"
+            db.session.commit()
+        else:
+            flash("Car park is already unblocked.", "warning")
+    else:
+        flash("Car park not found.", "error")
 
 
 @views.route('/create_carpark', methods=['GET', 'POST'])

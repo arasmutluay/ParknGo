@@ -1,3 +1,5 @@
+import os
+
 from flask import Blueprint, flash, redirect, url_for, session, render_template, request
 from flask_login import current_user, logout_user, login_required, login_user
 from email_validator import validate_email, EmailNotValidError
@@ -5,17 +7,17 @@ from email.message import EmailMessage
 import ssl
 import smtplib
 from itsdangerous import URLSafeTimedSerializer
-from werkzeug.security import check_password_hash
-
 from website import db
 from website.models import User
+from dotenv import load_dotenv
 
 auth = Blueprint('auth', __name__)
+load_dotenv()
 
 
 def send_email(email_reciever, subject, body):
-    email_sender = 'aras.mutluay99@gmail.com'
-    email_password = 'igoz nfol azmc tqob'
+    email_sender = os.getenv('EMAIL_SENDER')
+    email_password = os.getenv('EMAIL_PASSWORD')
 
     em = EmailMessage()
     em['From'] = email_sender

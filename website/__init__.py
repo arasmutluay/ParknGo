@@ -1,23 +1,24 @@
-# from dotenv import load_dotenv
+import os
 from flask import Flask
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from os import path
 from flask_mail import Mail
+from dotenv import load_dotenv
+
 
 db = SQLAlchemy()
 migrate = Migrate()
 mail = Mail()
-DB_NAME = 'parkngo_db'
 
 
 def create_app():
     app = Flask(__name__)
-    # load_dotenv()
+    load_dotenv()
 
     app.config['SECRET_KEY'] = 'asd123'
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost:5432/parkngo'
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
 
     db.init_app(app)
     migrate.init_app(app, db)
@@ -46,7 +47,12 @@ def create_app():
 
 
 def create_database():
-    if not path.exists('website/' + DB_NAME):
+    db_name = os.getenv('DB_NAME')
+
+    if not db_name:
+        raise ValueError("DB_NAME environment variable is not set")
+
+    if not path.exists('website/' + db_name):
         db.create_all()
 
 

@@ -33,6 +33,7 @@
             <th scope="col">Max Total Capacity</th>
             <th scope="col">Status</th>
             <th scope="col">Actions</th>
+            <th scope="col">Details</th>
 
         </tr>
         </thead>
@@ -56,6 +57,12 @@
                         {% else %}
                             <button type="submit" name="action" value="unblock" class="btn btn-success">Unblock</button>
                         {% endif %}
+                    </form>
+                </td>
+                <td>
+                    <form action="{{ url_for('views.carpark_details') }}" method="POST">
+                        <input type="hidden" name="car_park_id" value="{{ car_park.id }}">
+                        <button type="submit" class="btn btn-primary">View Details</button>
                     </form>
                 </td>
             </tr>

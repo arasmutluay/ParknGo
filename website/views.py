@@ -28,6 +28,12 @@ def home():
                            active_car_parks=active_car_parks,
                            blocked_car_parks=blocked_car_parks)
 
+@views.route('/profile', methods=['GET', 'POST'])
+def profile():
+
+    return render_template("profile.html", user=current_user)
+
+
 
 @views.route('/carpark_list', methods=['GET', 'POST'])
 def carpark_list():

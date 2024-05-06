@@ -15,14 +15,14 @@
     />
     <style>
         header {
-            background-color: #3F72AF;
-            padding: 15px;
+            background-color: #3B322C;
+            padding: 0px 10px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
         .nav-link {
-            color: #3F72AF;
-            background-color: #DBE2EF;
+            color: #3B322C;
+            background-color: white;
             margin: 0 5px 0 5px;
             transition: transform 0.2s;
         }
@@ -35,16 +35,30 @@
             color: #3F72AF;
         }
 
+        .logo-img {
+            width: 70px;
+            height: 70px;
+            background-color: #F9F7F7;
+            margin: 5px;
+            transition: transform 0.2s;
+        }
+        .logo-img:hover{
+            transform: scale(1.05);
+        }
+
     </style>
 </head>
 <body>
 <header class="d-flex flex-wrap justify-content-between align-items-center border-bottom">
+    <a class="text-decoration-none" href="/">
+        <img src="../static/logo.png" alt="ParknGo Logo" class="logo-img">
+    </a>
+
     <ul class="nav nav-pills ms-auto">
         {% if user.is_authenticated %}
-            <p class="lead mb-4">Logged in as: {{ current_user.first_name }}</p>
-            <p class="lead mb-4">Role: {{ current_user.role }}</p>
             <li class="nav-item"><a id="home" aria-current="page" class="nav-link rounded-pill" href="/">Home</a></li>
-            <li class="nav-item"><a id="home" aria-current="page" class="nav-link rounded-pill" href="/change_password">Reset Password</a></li>
+            <li class="nav-item"><a id="home" aria-current="page" class="nav-link rounded-pill"
+                                    href="/profile">Profile</a></li>
             {% if user.role == 'admin' %}
                 <li class="nav-item"><a class="nav-link" href="/create_carpark">Create Car Park</a></li>
             {% endif %}

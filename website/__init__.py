@@ -7,7 +7,6 @@ from os import path
 from flask_mail import Mail
 from dotenv import load_dotenv
 
-
 db = SQLAlchemy()
 migrate = Migrate()
 mail = Mail()
@@ -54,6 +53,3 @@ def create_database():
 
     if not path.exists('website/' + db_name):
         db.create_all()
-
-
-

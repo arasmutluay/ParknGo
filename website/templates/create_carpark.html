@@ -16,14 +16,17 @@
 
 </head>
 <style>
-
+    .container-custom{
+        max-width: 500px;
+        margin: 50px auto;
+    }
 </style>
 <body>
 
-<div class="container">
-    <h1>Create a New Car Park</h1>
+<div class="container-custom">
+    <h1 class="text-center">Create a New Car Park</h1>
     <form method="POST">
-        <div class="mb-3">
+        <div class=" mt-3 mb-3">
             <label for="name" class="form-label">Car Park Name</label>
             <input type="text" class="form-control" id="name" name="name" required>
         </div>
@@ -49,7 +52,7 @@
             <input type="number" class="form-control" id="max_total_capacity" name="max_total_capacity">
         </div>
 
-        <button type="submit" class="btn btn-primary" onclick="clicked(event)">Submit</button>
+        <button type="submit" class="btn btn-dark" onclick="clicked(event)">Submit</button>
     </form>
 </div>
 

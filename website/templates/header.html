@@ -42,7 +42,8 @@
             margin: 5px;
             transition: transform 0.2s;
         }
-        .logo-img:hover{
+
+        .logo-img:hover {
             transform: scale(1.05);
         }
 
@@ -61,7 +62,10 @@
                                     href="/profile">Profile</a></li>
             {% if user.role == 'admin' %}
                 <li class="nav-item"><a class="nav-link" href="/create_carpark">Create Car Park</a></li>
+            {% elif user.role == 'user' %}
+                <li class="nav-item"><a class="nav-link" href="/search_carpark">Search Car Park</a></li>
             {% endif %}
+
             <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
         {% else %}
             <li class="nav-item"><a class="nav-link rounded-pill" href="/signup">Sign Up</a></li>

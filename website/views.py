@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from flask import Blueprint, render_template, request, flash, redirect, url_for
-from flask_login import current_user
+from flask_login import current_user, login_required
 from .models import User, Carpark
 from website import db
 
@@ -10,29 +10,75 @@ views = Blueprint('views', __name__)
 
 @views.route('/', methods=['GET', 'POST'])
 def home():
-    # user queries
-    total_end_users = User.query.count()
-    active_end_users = User.query.filter_by(status='active').count()
-    inactive_end_users = User.query.filter_by(status='inactive').count()
+    if current_user.is_authenticated and current_user.role == 'admin':
 
-    # Carpark queries
-    total_car_parks = Carpark.query.count()
-    active_car_parks = Carpark.query.filter_by(status='active').count()
-    blocked_car_parks = Carpark.query.filter_by(status='blocked').count()
+        total_end_users = User.query.count()
+        active_end_users = User.query.filter_by(status='active').count()
+        inactive_end_users = User.query.filter_by(status='inactive').count()
+        total_car_parks = Carpark.query.count()
+        active_car_parks = Carpark.query.filter_by(status='active').count()
+        blocked_car_parks = Carpark.query.filter_by(status='blocked').count()
 
-    return render_template("home.html", user=current_user,
-                           total_end_users=total_end_users,
-                           active_end_users=active_end_users,
-                           inactive_end_users=inactive_end_users,
-                           total_car_parks=total_car_parks,
-                           active_car_parks=active_car_parks,
-                           blocked_car_parks=blocked_car_parks)
+        return render_template("home.html", user=current_user,
+                               total_end_users=total_end_users,
+                               active_end_users=active_end_users,
+                               inactive_end_users=inactive_end_users,
+                               total_car_parks=total_car_parks,
+                               active_car_parks=active_car_parks,
+                               blocked_car_parks=blocked_car_parks)
+    else:
 
-@views.route('/profile', methods=['GET', 'POST'])
+        return render_template("home.html", user=current_user)
+
+
+@views.route('/search_carpark', methods=['GET', 'POST'])
+def search_carparks():
+    if request.method == 'POST':
+        car_park_location = request.form.get('car_park_location')
+        car_park_id = request.form.get('car_park_id')
+        all_car_parks = Carpark.query.filter_by(location=car_park_location, status='active').all()
+
+        print("car park location:", car_park_location)
+        print("all car parks:", all_car_parks)
+
+        return render_template("search_carparks.html", user=current_user,
+                               all_car_parks=all_car_parks,
+                               car_park_location=car_park_location,
+                               car_park_id=car_park_id)
+    else:
+        distinct_locations = Carpark.query.with_entities(Carpark.location).distinct().all()
+        print("Distinct locations:", distinct_locations)
+
+        return render_template("search_carparks.html", user=current_user,
+                               distinct_locations=distinct_locations)
+
+
+@views.route('/search_results', methods=['GET', 'POST'])
+def search_results():
+    car_park_location = request.form.get('car_park_location')
+    start_date = request.form.get('start_date')
+    end_date = request.form.get('end_date')
+
+    page = request.args.get('page', 1, type=int)
+    rows_per_page = 20
+
+    print("car_park_location:", car_park_location)
+
+    car_parks = Carpark.query.filter_by(location=car_park_location).paginate(page=page, per_page=rows_per_page)
+
+    if not car_parks:
+        flash('No results found.', category='error')
+        return redirect(url_for('views.home'))
+
+    return render_template("search_results.html", car_parks=car_parks, user=current_user,
+                           car_park_location=car_park_location,
+                           start_date=start_date,
+                           end_date=end_date)
+
+
+@views.route('/profile', methods=['GET'])
 def profile():
-
     return render_template("profile.html", user=current_user)
-
 
 
 @views.route('/carpark_list', methods=['GET', 'POST'])
@@ -84,7 +130,6 @@ def carpark_details():
         else:
             flash("Car park not found.", "error")
             return redirect(url_for('views.carpark_list'))
-
 
     return render_template("carpark_details.html", user=current_user,
                            car_park=car_park,
@@ -173,10 +218,7 @@ def create_carpark():
         elif int(max_allowed_capacity) <= 0 or int(max_total_capacity) <= 0:
             flash('Please enter an allowed capacity or total capacity!', category='error')
 
-
-
         else:
-
             new_carpark = Carpark(name=name,
                                   company=company,
                                   location=location,
@@ -192,3 +234,9 @@ def create_carpark():
             return redirect(url_for('views.home'))
 
     return render_template("create_carpark.html", user=current_user)
+
+
+def search_carpark():
+    car_park_id = request.args.get('car_park_id')
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')

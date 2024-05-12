@@ -2,7 +2,7 @@ from datetime import datetime
 
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import current_user, login_required
-from .models import User, Carpark
+from .models import User, Carpark, reservations
 from website import db
 
 views = Blueprint('views', __name__)
@@ -32,53 +32,64 @@ def home():
 
 
 @views.route('/search_carpark', methods=['GET', 'POST'])
-def search_carparks():
+def search_carpark():
     if request.method == 'POST':
         car_park_location = request.form.get('car_park_location')
         car_park_id = request.form.get('car_park_id')
-        all_car_parks = Carpark.query.filter_by(location=car_park_location, status='active').all()
+        car_parks = Carpark.query.filter_by(location=car_park_location, status='active').all()
 
         print("car park location:", car_park_location)
-        print("all car parks:", all_car_parks)
+        print("all car parks:", car_parks)
 
-        return render_template("search_carparks.html", user=current_user,
-                               all_car_parks=all_car_parks,
+        return render_template("search_results.html", user=current_user,
+                               car_parks=car_parks,
                                car_park_location=car_park_location,
-                               car_park_id=car_park_id)
+                               car_park_id=car_park_id,
+                               )
+
     else:
         distinct_locations = Carpark.query.with_entities(Carpark.location).distinct().all()
         print("Distinct locations:", distinct_locations)
 
-        return render_template("search_carparks.html", user=current_user,
+        return render_template("search_carpark.html", user=current_user,
                                distinct_locations=distinct_locations)
 
 
 @views.route('/search_results', methods=['GET', 'POST'])
 def search_results():
-    car_park_location = request.form.get('car_park_location')
-    start_date = request.form.get('start_date')
-    end_date = request.form.get('end_date')
-
     page = request.args.get('page', 1, type=int)
-    rows_per_page = 20
+    rows_per_page = 3
 
-    print("car_park_location:", car_park_location)
-
-    car_parks = Carpark.query.filter_by(location=car_park_location).paginate(page=page, per_page=rows_per_page)
+    car_parks = Carpark.query.paginate(page=page, per_page=rows_per_page)
 
     if not car_parks:
         flash('No results found.', category='error')
         return redirect(url_for('views.home'))
 
-    return render_template("search_results.html", car_parks=car_parks, user=current_user,
-                           car_park_location=car_park_location,
-                           start_date=start_date,
-                           end_date=end_date)
+    return render_template("search_results.html", car_parks=car_parks, user=current_user)
 
 
-@views.route('/profile', methods=['GET'])
-def profile():
-    return render_template("profile.html", user=current_user)
+@views.route('/create_reservation/<int:car_park_id>', methods=['GET', 'POST'])
+def create_reservation(car_park_id):
+    if request.method == 'POST':
+        user_id = current_user.id
+        start_date = request.form.get('start_date')
+        end_date = request.form.get('end_date')
+
+        if not user_id:
+            flash('User ID is required.', 'error')
+            return redirect(url_for('views.create_reservation', car_park_id=car_park_id))
+
+        new_reservation = reservations.insert().values(user_id=user_id, carpark_id=car_park_id)
+        db.session.execute(new_reservation)
+        db.session.commit()
+
+        flash('Reservation created successfully.', 'success')
+        return redirect(url_for('views.home'))
+    else:
+        car_park = Carpark.query.get_or_404(car_park_id)
+        return render_template("create_reservation.html", user=current_user,
+                               car_park=car_park)
 
 
 @views.route('/carpark_list', methods=['GET', 'POST'])
@@ -101,12 +112,17 @@ def carpark_list():
         return redirect(url_for('views.carpark_list'))
 
     page = request.args.get('page', 1, type=int)
-    rows_per_page = 20
+    rows_per_page = 3
 
     car_parks = Carpark.query.paginate(page=page, per_page=rows_per_page)
 
     return render_template("carpark_list.html", user=current_user,
                            car_parks=car_parks)
+
+
+@views.route('/profile', methods=['GET'])
+def profile():
+    return render_template("profile.html", user=current_user)
 
 
 @views.route('/carpark_details', methods=['GET', 'POST'])
@@ -234,9 +250,3 @@ def create_carpark():
             return redirect(url_for('views.home'))
 
     return render_template("create_carpark.html", user=current_user)
-
-
-def search_carpark():
-    car_park_id = request.args.get('car_park_id')
-    start_date = request.args.get('start_date')
-    end_date = request.args.get('end_date')

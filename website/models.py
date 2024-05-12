@@ -5,6 +5,13 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from . import db
 from flask_login import UserMixin
 
+# Associations
+reservations = db.Table(
+    'reservations',
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
+    db.Column('carpark_id', db.Integer, db.ForeignKey('carparks.id'), primary_key=True),
+)
+
 
 class User(db.Model, UserMixin):
     __tablename__ = 'users'

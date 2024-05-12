@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Reservation</title>
+    <!-- Include any necessary CSS files here -->
+</head>
+<body>
+<div class="container">
+    <h1>Create Reservation</h1>
+    <form action="{{ url_for('views.create_reservation', car_park_id=car_park.id) }}" method="POST">
+        <input type="hidden" name="car_park_id" value="{{ car_park_id }}">
+        <label for="start_date">Start Date:</label>
+        <input type="date" id="start_date" name="start_date" required>
+        <br>
+        <label for="end_date">End Date:</label>
+        <input type="date" id="end_date" name="end_date" required>
+        <br>
+        <button type="submit" class="btn btn-primary">Submit Reservation</button>
+    </form>
+</div>
+</body>
+</html>

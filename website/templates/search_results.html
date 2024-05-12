@@ -31,17 +31,23 @@
                 <td>{{ car_park.company }}</td>
                 <td>{{ car_park.location }}</td>
                 <td>{{ car_park.price }}</td>
+                <td>
+                    <a href="{{ url_for('views.create_reservation', car_park_id=car_park.id) }}"
+                       class="btn btn-primary">Reserve</a>
+
+
+                </td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
 
     {% if car_parks.has_prev %}
-        <a href="{{ url_for('views.carpark_list', page=car_parks.prev_num) }}" class="btn btn-primary">Previous</a>
+        <a href="{{ url_for('views.search_results', page=car_parks.prev_num) }}" class="btn btn-primary">Previous</a>
     {% endif %}
 
     {% if car_parks.has_next %}
-        <a href="{{ url_for('views.carpark_list', page=car_parks.next_num) }}" class="btn btn-primary">Next</a>
+        <a href="{{ url_for('views.search_results', page=car_parks.next_num) }}" class="btn btn-primary">Next</a>
     {% endif %}
 
 </div>

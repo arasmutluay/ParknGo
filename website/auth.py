@@ -163,7 +163,7 @@ def login():
     return render_template("login.html", user=current_user)
 
 
-@auth.route('/change_password', methods=['GET', 'POST'])
+@auth.route('/change_password', methods=['GET', 'POST'])  # Reset Password
 @login_required
 def change_password():
     if not current_user.is_authenticated:
@@ -171,19 +171,21 @@ def change_password():
         return redirect(url_for('views.home'))
 
     if request.method == 'POST':
-        old_password = request.form.get('old_password')
-        new_password = request.form.get('new_password')
+        new_password1 = request.form.get('new_password1')
+        new_password2 = request.form.get('new_password2')
         user = current_user
+        old_password = user.password
+        user_old_password = user.check_password(old_password)
 
-        if not user.check_password(old_password):
-            flash("Error: Incorrect old password. Please try again.", 'error')
+        if new_password1 != new_password2:
+            flash("Error: The password you entered is not correct. Please try again.", 'error')
             return redirect(url_for('auth.change_password'))
 
-        if new_password == old_password:
-            flash("Error: New password cannot be the same as your old password.", 'error')
+        if user.check_password(new_password1):
+            flash('Password cannot be the same.', category='error')
             return redirect(url_for('auth.change_password'))
 
-        user.set_password(new_password)
+        user.set_password(new_password1)
         db.session.commit()
 
         flash("Password changed successfully!", 'success')

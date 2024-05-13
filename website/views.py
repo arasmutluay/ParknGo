@@ -33,26 +33,11 @@ def home():
 
 @views.route('/search_carpark', methods=['GET', 'POST'])
 def search_carpark():
-    if request.method == 'POST':
-        car_park_location = request.form.get('car_park_location')
-        car_park_id = request.form.get('car_park_id')
-        car_parks = Carpark.query.filter_by(location=car_park_location, status='active').all()
+    distinct_locations = Carpark.query.with_entities(Carpark.location).distinct().all()
+    print("Distinct locations:", distinct_locations)
 
-        print("car park location:", car_park_location)
-        print("all car parks:", car_parks)
-
-        return render_template("search_results.html", user=current_user,
-                               car_parks=car_parks,
-                               car_park_location=car_park_location,
-                               car_park_id=car_park_id,
-                               )
-
-    else:
-        distinct_locations = Carpark.query.with_entities(Carpark.location).distinct().all()
-        print("Distinct locations:", distinct_locations)
-
-        return render_template("search_carpark.html", user=current_user,
-                               distinct_locations=distinct_locations)
+    return render_template("search_carpark.html", user=current_user,
+                           distinct_locations=distinct_locations)
 
 
 @views.route('/search_results', methods=['GET', 'POST'])
@@ -80,7 +65,17 @@ def create_reservation(car_park_id):
             flash('User ID is required.', 'error')
             return redirect(url_for('views.create_reservation', car_park_id=car_park_id))
 
-        new_reservation = reservations.insert().values(user_id=user_id, carpark_id=car_park_id)
+        existing_attempt = db.session.query(reservations).filter_by(
+            user_id=user_id, car_park_id=car_park_id).first()
+
+        if existing_attempt:
+            flash('The reservation has already been created.', 'error')
+            return redirect(url_for('views.search_carpark', user=current_user, car_park_id=car_park_id))
+
+        car_park = Carpark.query.filter_by(id=car_park_id).first()
+        car_park.last_action_date = datetime.now()
+
+        new_reservation = reservations.insert().values(user_id=user_id, car_park_id=car_park_id)
         db.session.execute(new_reservation)
         db.session.commit()
 

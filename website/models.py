@@ -9,7 +9,7 @@ from flask_login import UserMixin
 reservations = db.Table(
     'reservations',
     db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
-    db.Column('carpark_id', db.Integer, db.ForeignKey('carparks.id'), primary_key=True),
+    db.Column('car_park_id', db.Integer, db.ForeignKey('carparks.id'), primary_key=True),
 )
 
 

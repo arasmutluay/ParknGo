@@ -12,22 +12,15 @@
             href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
             rel="stylesheet"
     />
-
+    {% include "header.html" %}
 </head>
+<style>
+    .container {
+        width: 700px;
+    }
+</style>
 <body>
-<div class="container">
-
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-
+<div class="container mt-5">
     <form method="POST" action="{{ url_for('auth.sign_up') }}">
         <h1 class="h3 mb-3 fw-normal">Sign Up</h1>
         <div class="form-floating">
@@ -86,5 +79,27 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
+
+<script>
+    const form = document.querySelector('form');
+    const input = document.querySelector('input');
+
+    form.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        if (input.value.trim() === '') {
+            alert('Please fill out the input field!');
+        } else {
+            form.submit();
+        }
+    });
+
+    if (!document.getElementById("id1").value) {
+        document.getElementById("first_name").innerHTML = "*Required";
+        document.getElementById("fourm").addEventListener("click", function (event) {
+            event.preventDefault()
+        });
+
+</script>
 </body>
 </html>

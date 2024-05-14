@@ -34,8 +34,8 @@
 </div>
 
 <script>
-    document.getElementById('start_date').addEventListener('change', function () {
-        document.getElementById('end_date').min = this.value;
+    $("#start_date").on("change", function () {
+        $("#end_date").attr("min", $(this).val());
     });
 </script>
 

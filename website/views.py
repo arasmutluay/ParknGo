@@ -32,6 +32,7 @@ def home():
 
 
 @views.route('/search_carpark', methods=['GET', 'POST'])
+@login_required
 def search_carpark():
     distinct_locations = Carpark.query.with_entities(Carpark.location).distinct().all()
     print("Distinct locations:", distinct_locations)
@@ -41,6 +42,7 @@ def search_carpark():
 
 
 @views.route('/search_results', methods=['GET', 'POST'])
+@login_required
 def search_results():
     page = request.args.get('page', 1, type=int)
     rows_per_page = 3
@@ -55,6 +57,7 @@ def search_results():
 
 
 @views.route('/create_reservation/<int:car_park_id>', methods=['GET', 'POST'])
+@login_required
 def create_reservation(car_park_id):
     if request.method == 'POST':
         user_id = current_user.id
@@ -88,6 +91,7 @@ def create_reservation(car_park_id):
 
 
 @views.route('/carpark_list', methods=['GET', 'POST'])
+@login_required
 def carpark_list():
     if not current_user.is_authenticated and current_user.role == 'admin':
         flash("Access Denied: First you need to be logged in as an Admin!.", 'error')
@@ -116,11 +120,13 @@ def carpark_list():
 
 
 @views.route('/profile', methods=['GET'])
+@login_required
 def profile():
     return render_template("profile.html", user=current_user)
 
 
 @views.route('/carpark_details', methods=['GET', 'POST'])
+@login_required
 def carpark_details():
     if not current_user.is_authenticated or current_user.role != 'admin':
         flash("Access Denied: First you need to be logged in as an Admin!", 'error')
@@ -148,6 +154,7 @@ def carpark_details():
 
 
 @views.route('/update_carpark', methods=['POST'])
+@login_required
 def update_carpark():
     if not current_user.is_authenticated or current_user.role != 'admin':
         flash("Access Denied: First you need to be logged in as an Admin!", 'error')
@@ -203,6 +210,7 @@ def unblock_carpark(carpark_id):
 
 
 @views.route('/create_carpark', methods=['GET', 'POST'])
+@login_required
 def create_carpark():
     if not current_user.is_authenticated:
         flash("Access Denied: First you need to login before creating a Car Park!", 'error')
@@ -226,17 +234,26 @@ def create_carpark():
             flash('Car Park already exists!', category='error')
         elif int(price) < 0:
             flash('Please enter a correct price for the Car Park!', category='error')
-        elif int(max_allowed_capacity) <= 0 or int(max_total_capacity) <= 0:
+        elif int(max_allowed_capacity) <= 0:
             flash('Please enter an allowed capacity or total capacity!', category='error')
 
         else:
-            new_carpark = Carpark(name=name,
-                                  company=company,
-                                  location=location,
-                                  price=price,
-                                  max_allowed_capacity=max_allowed_capacity,
-                                  remaining_capacity=max_allowed_capacity,
-                                  max_total_capacity=max_total_capacity)
+
+            if max_total_capacity == '':
+                new_carpark = Carpark(name=name,
+                                      company=company,
+                                      location=location,
+                                      price=price,
+                                      max_allowed_capacity=max_allowed_capacity,
+                                      remaining_capacity=max_allowed_capacity)
+            else:
+                new_carpark = Carpark(name=name,
+                                      company=company,
+                                      location=location,
+                                      price=price,
+                                      max_allowed_capacity=max_allowed_capacity,
+                                      remaining_capacity=max_allowed_capacity,
+                                      max_total_capacity=max_total_capacity)
 
             db.session.add(new_carpark)
             db.session.commit()

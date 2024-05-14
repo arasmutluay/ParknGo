@@ -13,42 +13,60 @@
             rel="stylesheet"
     />
     {% include "header.html" %}
+    <style>
+        .container {
+            width: 500px;
+            border: 1px solid lightgray;
+            border-radius: 3%;
+            padding: 20px;
+        }
+
+        .required-error {
+            color: red;
+        }
+
+        .input-error {
+            border-color: red;
+        }
+    </style>
 </head>
-<style>
-    .container {
-        width: 700px;
-    }
-</style>
+
 <body>
 <div class="container mt-5">
-    <form method="POST" action="{{ url_for('auth.sign_up') }}">
+    <form id="signupForm" method="POST" action="{{ url_for('auth.sign_up') }}">
         <h1 class="h3 mb-3 fw-normal">Sign Up</h1>
         <div class="form-floating">
             <input type="text" class="form-control" id="first_name" name="first_name">
-            <label for="first_name">First Name</label>
+            <label for="first_name">First Name <span id="first_name_error" class="required-error"></span></label>
+
+
         </div>
         <div class="form-floating">
             <input type="text" class="form-control" id="last_name" name="last_name">
-            <label for="last_name">Last Name</label>
+            <label for="last_name">Last Name <span id="last_name_error" class="required-error"></span>
+            </label>
         </div>
         <div class="form-floating">
             <input type="email" class="form-control" id="email" name="email">
-            <label for="email">Email address</label>
+            <label for="email">Email address <span id="email_error" class="required-error"></span></label>
         </div>
 
         <div class="form-floating">
             <input type="date" class="form-control" id="birth_date" name="birth_date">
-            <label for="birth_date">Birth Date</label>
+            <label for="birth_date">Birth Date <span id="birth_date_error" class="required-error"></span></label>
+
         </div>
 
         <div class="form-floating">
             <input type="text" class="form-control" id="country" name="country">
-            <label for="country">Country</label>
+            <label for="country">Country <span id="country_error" class="required-error"></span></label>
+
         </div>
 
         <div class="form-floating">
             <input type="text" class="form-control" id="city" name="city">
-            <label for="city">City</label>
+            <label for="city">City <span id="city_error" class="required-error"></span></label>
+
         </div>
 
         <div class="form-floating">
@@ -62,14 +80,14 @@
 
         <div class="form-floating">
             <input type="text" class="form-control" id="address" name="address">
-            <label for="address">Address</label>
+            <label for="address">Address <span id="address_error" class="required-error"></span></label>
+
         </div>
 
         <div class="form-floating">
             <input type="text" class="form-control" id="phone_number" name="phone_number">
-            <label for="phone_number">Phone Number</label>
+            <label for="phone_number">Phone Number <span id="phone_number_error" class="required-error"></span></label>
         </div>
-
 
         <button class="btn btn-primary w-100 py-2" type="submit">Create Password</button>
     </form>
@@ -81,25 +99,36 @@
         crossorigin="anonymous"></script>
 
 <script>
-    const form = document.querySelector('form');
-    const input = document.querySelector('input');
+    const form = document.getElementById('signupForm');
 
     form.addEventListener('submit', function (event) {
+        // Prevent form submission
         event.preventDefault();
 
-        if (input.value.trim() === '') {
-            alert('Please fill out the input field!');
-        } else {
+        // Get all input fields
+        const inputs = form.querySelectorAll('input');
+
+        // Flag to check if any required field is empty
+        let isEmpty = false;
+
+        // Check each input field
+        inputs.forEach(input => {
+            if (input.value.trim() === '') {
+                isEmpty = true;
+                const fieldName = input.getAttribute('name');
+                const errorSpan = document.getElementById(`${fieldName}_error`);
+
+                // Add class to highlight the input field with a red border
+                input.classList.add('input-error');
+                errorSpan.classList.add('required-error');
+            }
+        });
+
+        // If any required field is empty, do not submit the form
+        if (!isEmpty) {
             form.submit();
         }
     });
-
-    if (!document.getElementById("id1").value) {
-        document.getElementById("first_name").innerHTML = "*Required";
-        document.getElementById("fourm").addEventListener("click", function (event) {
-            event.preventDefault()
-        });
-
 </script>
 </body>
 </html>

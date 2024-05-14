@@ -11,21 +11,19 @@
             href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
             rel="stylesheet"
     />
-
+    {% include "header.html" %}
 </head>
-<body>
-<div class="container">
+<style>
+    .container {
+        width: 500px;
+        border: 1px solid lightgray;
+        border-radius: 3%;
+        padding: 20px;
+    }
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
+</style>
+<body>
+<div class="container mt-5">
 
     <form method="POST">
         <h1 class="h3 mb-3 fw-normal">Login</h1>
@@ -39,7 +37,7 @@
             <label for="password">Password</label>
         </div>
 
-        <button class="btn btn-primary w-100 py-2" type="submit">Login!</button>
+        <button class="btn btn-primary w-30 py-2 mt-2 mx-auto d-block" type="submit">Login!</button>
     </form>
 </div>
 

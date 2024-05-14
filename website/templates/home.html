@@ -26,6 +26,9 @@
             max-width: 900px;
             margin: auto;
         }
+        .container-user{
+            max-width: 600px;
+        }
 
         .featurette-divider {
             margin: 50px 0;
@@ -56,13 +59,21 @@
         </div>
 
     {% elif user.is_authenticated and user.role == 'user' %}
-        <p>welcome user</p>
+        <div class="container-user my-5">
+            <h2 align="center" class="featurette-heading ">Welcome to ParknGo, {{ user.first_name }}! </h2>
+            <p class="lead">
+                We're thrilled to have you on board. With ParknGo, managing your car park reservations is a
+                breeze.
+                Our intuitive reservation management system allows you to easily search for available parking
+                spots
+                in your desired location, select your preferred dates, and make reservations with just a few
+                clicks.
+            </p>
+        </div>
 
     {% else %}
         <div class="container marketing">
-
             <hr class="featurette-divider">
-
             <div class="row featurette">
                 <div class="col-md-7">
                     <h2 class="featurette-heading">Intuitive Reservation Management.</h2>
@@ -73,7 +84,7 @@
                         the process, ensuring a hassle-free parking experience every time.</p>
                 </div>
                 <div class="col-md-5">
-                    <img src="../static/photo1.png" height="300px" width="380px" class="mt-5">
+                    <img src="../static/photo1.png" height="300px" width="420px" class="mt-5">
                 </div>
             </div>
 

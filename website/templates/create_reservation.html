@@ -37,6 +37,8 @@
     $("#start_date").on("change", function () {
         $("#end_date").attr("min", $(this).val());
     });
+    $("#start_date").attr("min", new Date().toISOString().split("T")[0]);
+
 </script>
 
 

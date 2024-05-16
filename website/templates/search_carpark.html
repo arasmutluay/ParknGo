@@ -26,10 +26,10 @@
 </head>
 <body>
 <div class="container-custom px-4 py-5 my-5">
-    <form action="/search_results" method="POST">
+    <form action="/search_carpark" method="POST">
         <div class="form-group mb-3">
-            <label for="car_park_location" class="form-label">Car Park:</label>
-            <select id="car_park_location" class="form-select" name="car_park_location" required>
+            <label for="location" class="form-label">Car Park:</label>
+            <select id="location" class="form-select" name="location" required>
                 {% for location in distinct_locations %}
                     <option value="{{ location[0] }}">{{ location[0] }}</option>
                 {% endfor %}

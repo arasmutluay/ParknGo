@@ -10,6 +10,8 @@ reservations = db.Table(
     'reservations',
     db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
     db.Column('car_park_id', db.Integer, db.ForeignKey('carparks.id'), primary_key=True),
+    db.Column('start_date', db.DateTime, nullable=False),
+    db.Column('end_date', db.DateTime, nullable=False)
 )
 
 

@@ -1,6 +1,6 @@
 # ParknGo
 
-Welcome to ParknGo, your go-to solution for park reservations! ParknGo is a web-based application designed to simplify the process of reserving parking spaces in various parks.
+Welcome to ParknGo, ParknGo is a web-based application designed to simplify the process of reserving parking spaces in various parks.
 
 ## Features
 
